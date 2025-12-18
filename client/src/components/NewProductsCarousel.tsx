@@ -147,9 +147,9 @@ const NewProductsCarousel = () => {
                     to={`/products/${product.id}`}
                     className="flex-shrink-0 w-1/2 sm:w-1/2 md:w-1/3 lg:w-1/4 group/card"
                   >
-                    <div className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow border border-border/50">
+                    <div className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow border border-border/50 h-full flex flex-col">
                       {/* Image Container */}
-                      <div className="relative w-full aspect-square bg-muted overflow-hidden">
+                      <div className="relative w-full aspect-square bg-muted overflow-hidden flex-shrink-0">
                         {imageUrl ? (
                           <img
                             src={imageUrl}
@@ -169,13 +169,15 @@ const NewProductsCarousel = () => {
                       </div>
 
                       {/* Content */}
-                      <div className="p-4 space-y-2">
-                        <h3 className="font-semibold text-lg line-clamp-2 group-hover/card:text-primary transition-colors">
+                      <div className="p-3 sm:p-4 space-y-2 flex-1 flex flex-col">
+                        <h3 className="font-semibold text-sm sm:text-lg line-clamp-2 group-hover/card:text-primary transition-colors flex-shrink-0">
                           {product.name}
                         </h3>
-                        <p className="text-sm text-muted-foreground line-clamp-2">{product.description}</p>
-                        <div className="flex items-center justify-between pt-2">
-                          <span className="text-primary font-bold text-lg">
+                        {product.description && (
+                          <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 flex-1">{product.description}</p>
+                        )}
+                        <div className="flex items-center justify-between pt-2 flex-shrink-0">
+                          <span className="text-primary font-bold text-sm sm:text-lg">
                             RS. {!isNaN(Number(product.price)) ? Number(product.price).toFixed(2) : "N/A"}
                           </span>
                           {product.stock_quantity > 0 && (

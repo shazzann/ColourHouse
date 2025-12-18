@@ -22,10 +22,18 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // Middleware
 app.use(
   cors({
-    origin: ["https://colour-house-gamma.vercel.app/"],
+    origin: [
+      "https://colour-house-gamma.vercel.app",
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   })
 );
+
+// handle preflight
+app.options("*", cors());
+
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'uploads')));
 

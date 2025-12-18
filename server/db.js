@@ -6,21 +6,39 @@ dotenv.config();
 
 /**
  * Railway provides DATABASE_URL
- * Example:
- * postgresql://user:password@host:port/dbname
+ * Example: postgresql://user:password@host:port/dbname
+ * 
+ * For local development, use individual env vars:
+ * DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD
  */
-if (!process.env.DATABASE_URL) {
-  console.error("❌ DATABASE_URL is not set");
+
+let pool;
+
+if (process.env.DATABASE_URL) {
+  // Railway or production environment
+  console.log("📡 Using DATABASE_URL for connection");
+  pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl:
+      process.env.NODE_ENV === "production"
+        ? { rejectUnauthorized: false }
+        : false,
+  });
+} else if (process.env.DB_HOST && process.env.DB_USER) {
+  // Local development with individual variables
+  console.log("🏠 Using individual database configuration");
+  pool = new Pool({
+    host: process.env.DB_HOST || 'localhost',
+    port: process.env.DB_PORT || 5432,
+    database: process.env.DB_NAME || 'paint_connect',
+    user: process.env.DB_USER || 'postgres',
+    password: process.env.DB_PASSWORD || 'password',
+  });
+} else {
+  console.error("❌ No DATABASE_URL or individual database config found");
+  console.error("Please set either DATABASE_URL or DB_HOST/DB_USER in .env");
   process.exit(1);
 }
-
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl:
-    process.env.NODE_ENV === "production"
-      ? { rejectUnauthorized: false }
-      : false,
-});
 
 pool.on("connect", () => {
   console.log("✅ Connected to PostgreSQL");

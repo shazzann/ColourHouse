@@ -384,7 +384,7 @@ const ProductDialog = ({ open, onOpenChange, product, onSuccess }: ProductDialog
                 type="number"
                 value={formData.stock_quantity}
                 onChange={(e) => setFormData({ ...formData, stock_quantity: e.target.value })}
-                required
+                
               />
             </div>
 

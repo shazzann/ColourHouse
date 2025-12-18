@@ -158,7 +158,7 @@ const ProductsTab = () => {
                     <TableCell className="font-medium">{product.name}</TableCell>
                     <TableCell>{product.code || "-"}</TableCell>
                     <TableCell>${!isNaN(Number(product.price)) ? Number(product.price).toFixed(2) : "-"}</TableCell>
-                    <TableCell>{product.stock_quantity}</TableCell>
+                    <TableCell>{product.stock_quantity !== null && product.stock_quantity !== undefined ? product.stock_quantity : "-"}</TableCell>
                     <TableCell>
                       <Badge variant={product.status === "active" ? "default" : "secondary"}>
                         {product.status}

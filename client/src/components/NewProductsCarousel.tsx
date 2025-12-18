@@ -117,11 +117,11 @@ const NewProductsCarousel = () => {
         </div>
 
         {/* Carousel Container */}
-        <div className="relative group">
+        <div className="relative group px-12">
           {/* Left Arrow */}
           <button
             onClick={goToPrevious}
-            className="absolute -left-4 md:left-0 top-1/2 -translate-y-1/2 z-20 bg-primary/80 hover:bg-primary text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity"
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-primary/80 hover:bg-primary text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity"
             aria-label="Previous products"
           >
             <ChevronLeft className="h-6 w-6" />
@@ -147,9 +147,9 @@ const NewProductsCarousel = () => {
                     to={`/products/${product.id}`}
                     className="flex-shrink-0 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 group/card"
                   >
-                    <div className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow border border-border/50">
+                    <div className="h-full bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow border border-border/50 flex flex-col">
                       {/* Image Container */}
-                      <div className="relative w-full aspect-square bg-muted overflow-hidden">
+                      <div className="relative w-full aspect-square bg-muted overflow-hidden flex-shrink-0">
                         {imageUrl ? (
                           <img
                             src={imageUrl}
@@ -169,18 +169,22 @@ const NewProductsCarousel = () => {
                       </div>
 
                       {/* Content */}
-                      <div className="p-4 space-y-2">
+                      <div className="p-4 space-y-2 flex-1 flex flex-col">
                         <h3 className="font-semibold text-lg line-clamp-2 group-hover/card:text-primary transition-colors">
                           {product.name}
                         </h3>
-                        <p className="text-sm text-muted-foreground line-clamp-2">{product.description}</p>
-                        <div className="flex items-center justify-between pt-2">
-                          <span className="text-primary font-bold text-lg">
-                            RS. {!isNaN(Number(product.price)) ? Number(product.price).toFixed(2) : "N/A"}
-                          </span>
+                        {product.description && (
+                          <p className="text-sm text-muted-foreground line-clamp-2 flex-1">{product.description}</p>
+                        )}
+                        <div className="flex items-center justify-between pt-2 mt-auto">
+                          {product.price && (
+                            <span className="text-primary font-bold text-lg">
+                              RS. {!isNaN(Number(product.price)) ? Number(product.price).toFixed(2) : "N/A"}
+                            </span>
+                          )}
                           {product.stock_quantity > 0 && (
                             <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
-                              In Stock
+                              In Stock ({product.stock_quantity})
                             </span>
                           )}
                         </div>
@@ -195,7 +199,7 @@ const NewProductsCarousel = () => {
           {/* Right Arrow */}
           <button
             onClick={goToNext}
-            className="absolute -right-4 md:right-0 top-1/2 -translate-y-1/2 z-20 bg-primary/80 hover:bg-primary text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity"
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-primary/80 hover:bg-primary text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity"
             aria-label="Next products"
           >
             <ChevronRight className="h-6 w-6" />

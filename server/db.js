@@ -1,29 +1,42 @@
-import pkg from 'pg';
+import pkg from "pg";
 const { Pool } = pkg;
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 
 dotenv.config();
 
+/**
+ * Railway provides DATABASE_URL
+ * Example:
+ * postgresql://user:password@host:port/dbname
+ */
+if (!process.env.DATABASE_URL) {
+  console.error("❌ DATABASE_URL is not set");
+  process.exit(1);
+}
+
 const pool = new Pool({
-  host: process.env.DB_HOST || 'localhost',
-  port: process.env.DB_PORT || 5432,
-  database: process.env.DB_NAME || 'paint_connect',
-  user: process.env.DB_USER || 'postgres',
-  password: process.env.DB_PASSWORD || 'password',
+  connectionString: process.env.DATABASE_URL,
+  ssl:
+    process.env.NODE_ENV === "production"
+      ? { rejectUnauthorized: false }
+      : false,
 });
 
-pool.on('connect', () => {
-  console.log('Connected to PostgreSQL database');
+pool.on("connect", () => {
+  console.log("✅ Connected to PostgreSQL");
 });
 
-pool.on('error', (err) => {
-  console.error('Unexpected error on idle client', err);
+pool.on("error", (err) => {
+  console.error("❌ PostgreSQL error", err);
+  process.exit(1);
 });
 
 // Initialize database schema
 const initializeDatabase = async () => {
   try {
-    // Users table
+    // Needed for gen_random_uuid()
+    await pool.query(`CREATE EXTENSION IF NOT EXISTS pgcrypto`);
+
     await pool.query(`
       CREATE TABLE IF NOT EXISTS users (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -34,7 +47,6 @@ const initializeDatabase = async () => {
       )
     `);
 
-    // Products table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS products (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -51,7 +63,6 @@ const initializeDatabase = async () => {
       )
     `);
 
-    // Categories table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS categories (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -61,7 +72,6 @@ const initializeDatabase = async () => {
       )
     `);
 
-    // Product categories junction table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS product_categories (
         product_id UUID NOT NULL REFERENCES products(id) ON DELETE CASCADE,
@@ -70,7 +80,6 @@ const initializeDatabase = async () => {
       )
     `);
 
-    // Contact messages table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS contact_messages (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -83,7 +92,6 @@ const initializeDatabase = async () => {
       )
     `);
 
-    // Settings table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS settings (
         id TEXT PRIMARY KEY,
@@ -96,24 +104,20 @@ const initializeDatabase = async () => {
       )
     `);
 
-    // Insert default settings if they don't exist
     await pool.query(`
       INSERT INTO settings (id, whatsapp_number, store_name, phone_number, address, opening_hours)
       VALUES ('default', '', 'Paint Connect', '', '', '')
       ON CONFLICT (id) DO NOTHING
     `);
 
-    console.log('Database schema initialized successfully');
-  } catch (error) {
-    console.error('Error initializing database schema:', error);
-    throw error;
+    console.log("✅ Database schema initialized");
+  } catch (err) {
+    console.error("❌ Database initialization failed", err);
+    process.exit(1);
   }
 };
 
-// Initialize on startup
-initializeDatabase().catch(err => {
-  console.error('Failed to initialize database:', err);
-  process.exit(1);
-});
+// Run on startup
+initializeDatabase();
 
 export default pool;

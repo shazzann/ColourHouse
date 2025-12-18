@@ -54,7 +54,7 @@ const ProductDialog = ({ open, onOpenChange, product, onSuccess }: ProductDialog
     size: "",
     price: "",
     description: "",
-    stock_quantity: "",
+    stock_quantity: "0",
     status: "active",
   });
   const { toast } = useToast();
@@ -73,7 +73,7 @@ const ProductDialog = ({ open, onOpenChange, product, onSuccess }: ProductDialog
         size: product.size || "",
         price: product.price?.toString() || "",
         description: product.description || "",
-        stock_quantity: product.stock_quantity ? product.stock_quantity.toString() : "",
+        stock_quantity: product.stock_quantity?.toString() || "0",
         status: product.status || "active",
       });
       // Set existing image URLs
@@ -93,7 +93,7 @@ const ProductDialog = ({ open, onOpenChange, product, onSuccess }: ProductDialog
         size: "",
         price: "",
         description: "",
-        stock_quantity: "",
+        stock_quantity: "0",
         status: "active",
       });
       setSelectedCategories([]);
@@ -226,7 +226,7 @@ const ProductDialog = ({ open, onOpenChange, product, onSuccess }: ProductDialog
         size: formData.size || null,
         price: formData.price ? parseFloat(formData.price) : null,
         description: formData.description || null,
-        stock_quantity: formData.stock_quantity ? parseInt(formData.stock_quantity) : null,
+        stock_quantity: parseInt(formData.stock_quantity) || 0,
         status: formData.status,
         images: allImageUrls,
       };
@@ -378,13 +378,13 @@ const ProductDialog = ({ open, onOpenChange, product, onSuccess }: ProductDialog
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="stock">Stock Quantity (Optional)</Label>
+              <Label htmlFor="stock">Stock Quantity *</Label>
               <Input
                 id="stock"
                 type="number"
-                placeholder="Leave empty for no stock info"
                 value={formData.stock_quantity}
                 onChange={(e) => setFormData({ ...formData, stock_quantity: e.target.value })}
+                required
               />
             </div>
 

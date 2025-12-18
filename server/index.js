@@ -20,7 +20,12 @@ const PORT = process.env.PORT || 3001;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Middleware
-app.use(cors());
+app.use(
+  cors({
+    origin: ["https://colour-house-gamma.vercel.app/"],
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'uploads')));
 

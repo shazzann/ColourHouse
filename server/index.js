@@ -44,7 +44,7 @@ app.use('/api/categories', categoriesRoutes);
 app.use('/api/product-categories', productCategoriesRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/messages', messagesRoutes);
-app.use('/uploads', uploadsRoutes);
+app.use('/api/uploads', uploadsRoutes);
 
 // Health check
 app.get('/health', (req, res) => {

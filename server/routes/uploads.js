@@ -1,87 +1,72 @@
-import express from 'express';
-import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
-import { promises as fsPromises } from 'fs';
-import { fileURLToPath } from 'url';
-import { verifyToken } from '../middleware/auth.js';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const uploadsDir = path.join(__dirname, '..', 'uploads');
-
-// Ensure uploads directory exists
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadsDir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
-  },
-});
-
-const upload = multer({
-  storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
-  fileFilter: (req, file, cb) => {
-    if (!file.mimetype.startsWith('image/')) {
-      cb(new Error('File must be an image'));
-    } else {
-      cb(null, true);
-    }
-  },
-});
+import express from "express";
+import multer from "multer";
+import path from "path";
+import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { verifyToken } from "../middleware/auth.js";
 
 const router = express.Router();
 
-// Upload image
-router.post('/upload', verifyToken, upload.single('file'), (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ error: 'No file uploaded' });
-  }
-
-  const filePath = `/uploads/${req.file.filename}`;
-  res.json({ path: filePath });
+// memory upload (no disk)
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+  fileFilter: (req, file, cb) => {
+    if (!file.mimetype.startsWith("image/")) cb(new Error("File must be an image"));
+    else cb(null, true);
+  },
 });
 
-// Get image (public)
-router.get('/:filename', (req, res) => {
-  const filePath = path.join(uploadsDir, req.params.filename);
-
-  // Security: prevent directory traversal
-  if (!filePath.startsWith(uploadsDir)) {
-    return res.status(403).json({ error: 'Access denied' });
-  }
-
-  if (!fs.existsSync(filePath)) {
-    return res.status(404).json({ error: 'File not found' });
-  }
-
-  res.sendFile(filePath);
+const s3 = new S3Client({
+  region: "auto",
+  endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+  credentials: {
+    accessKeyId: process.env.R2_ACCESS_KEY_ID,
+    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
+  },
+  forcePathStyle: true,
 });
 
-// Delete image
-router.delete('/:filename', verifyToken, async (req, res) => {
+const BUCKET = process.env.R2_BUCKET;
+const PUBLIC_BASE = process.env.R2_PUBLIC_BASE_URL?.replace(/\/$/, "");
+
+router.post("/upload", verifyToken, upload.single("file"), async (req, res) => {
   try {
-    const filePath = path.join(uploadsDir, req.params.filename);
+    if (!req.file) return res.status(400).json({ error: "No file uploaded" });
+    if (!PUBLIC_BASE) return res.status(500).json({ error: "R2_PUBLIC_BASE_URL missing" });
 
-    // Security: prevent directory traversal
-    if (!filePath.startsWith(uploadsDir)) {
-      return res.status(403).json({ error: 'Access denied' });
-    }
+    const ext = path.extname(req.file.originalname) || ".jpg";
+    const filename = `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
 
-    if (!fs.existsSync(filePath)) {
-      return res.status(404).json({ error: 'File not found' });
-    }
+    await s3.send(
+      new PutObjectCommand({
+        Bucket: BUCKET,
+        Key: filename,
+        Body: req.file.buffer,
+        ContentType: req.file.mimetype,
+      })
+    );
 
-    await fsPromises.unlink(filePath);
+    // Return full public URL (best for your frontend)
+    res.json({ path: `${PUBLIC_BASE}/${filename}` });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Upload failed" });
+  }
+});
+
+// Optional delete (if you use it)
+router.delete("/:filename", verifyToken, async (req, res) => {
+  try {
+    await s3.send(
+      new DeleteObjectCommand({
+        Bucket: BUCKET,
+        Key: req.params.filename,
+      })
+    );
     res.json({ success: true });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Delete failed" });
   }
 });
 

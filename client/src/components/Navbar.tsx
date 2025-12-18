@@ -25,15 +25,20 @@ const Navbar = () => {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
+
             <Link to="/" className="flex items-center space-x-2 group">
               <img
                 src="/logo.png"
                 alt="Colour House Logo"
                 className="h-8 w-8 object-contain group-hover:rotate-12 transition-transform"
               />
-              <span className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                Colour House
+              <span
+                className="text-3xl font-bold  bg-clip-text "
+                style={{ fontFamily: "Orbitron, sans-serif", letterSpacing: "0.04em", fontWeight: "bold" , color: "rgba(15, 71, 158)" }}
+              >
+                COLOUR HOU<span className="text-red-700">S</span>E
               </span>
+
               {/* <span className="text-3xl font-bold text-blue-600">
                 COLOUR HOU<span className="text-red-600"></span>e
               </span> */}

@@ -3,6 +3,7 @@ import { ArrowRight, Palette, Shield, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import NewProductsCarousel from "@/components/NewProductsCarousel";
 
 const Home = () => {
   const features = [
@@ -57,6 +58,9 @@ const Home = () => {
           </div>
         </div>
       </section>
+
+      {/* New Products Carousel */}
+      <NewProductsCarousel />
 
       {/* Features Section */}
       <section className="py-20 bg-background">

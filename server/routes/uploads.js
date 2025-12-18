@@ -39,17 +39,17 @@ const upload = multer({
 const router = express.Router();
 
 // Upload image
-router.post('/upload', verifyToken, upload.single('file'), (req, res) => {
+router.post('api/upload', verifyToken, upload.single('file'), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: 'No file uploaded' });
   }
 
-  const filePath = `/uploads/${req.file.filename}`;
+  const filePath = `api/uploads/${req.file.filename}`;
   res.json({ path: filePath });
 });
 
 // Get image (public)
-router.get('/:filename', (req, res) => {
+router.get('api/:filename', (req, res) => {
   const filePath = path.join(uploadsDir, req.params.filename);
 
   // Security: prevent directory traversal

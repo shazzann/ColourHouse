@@ -31,7 +31,7 @@ const NewProductsCarousel = () => {
     const handleResize = () => {
       setScreenWidth(window.innerWidth);
       if (window.innerWidth < 640) {
-        setItemsToShow(1);
+        setItemsToShow(2);
       } else if (window.innerWidth < 1024) {
         setItemsToShow(2);
       } else if (window.innerWidth < 1536) {
@@ -117,11 +117,11 @@ const NewProductsCarousel = () => {
         </div>
 
         {/* Carousel Container */}
-        <div className="relative group">
+        <div className="relative group px-8 sm:px-0">
           {/* Left Arrow */}
           <button
             onClick={goToPrevious}
-            className="absolute -left-4 md:left-0 top-1/2 -translate-y-1/2 z-20 bg-primary/80 hover:bg-primary text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity"
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-primary/80 hover:bg-primary text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity"
             aria-label="Previous products"
           >
             <ChevronLeft className="h-6 w-6" />
@@ -129,7 +129,7 @@ const NewProductsCarousel = () => {
 
           {/* Products Grid */}
           <div className="overflow-hidden">
-            <div className="flex gap-4 transition-transform duration-500 ease-out">
+            <div className="flex gap-2 sm:gap-4 transition-transform duration-500 ease-out">
               {displayedProducts.map((product) => {
                 let imageUrl = "";
                 try {
@@ -145,7 +145,7 @@ const NewProductsCarousel = () => {
                   <Link
                     key={product.id}
                     to={`/products/${product.id}`}
-                    className="flex-shrink-0 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 group/card"
+                    className="flex-shrink-0 w-1/2 sm:w-1/2 md:w-1/3 lg:w-1/4 group/card"
                   >
                     <div className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow border border-border/50">
                       {/* Image Container */}
@@ -195,7 +195,7 @@ const NewProductsCarousel = () => {
           {/* Right Arrow */}
           <button
             onClick={goToNext}
-            className="absolute -right-4 md:right-0 top-1/2 -translate-y-1/2 z-20 bg-primary/80 hover:bg-primary text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity"
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-primary/80 hover:bg-primary text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity"
             aria-label="Next products"
           >
             <ChevronRight className="h-6 w-6" />

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, Pencil, Trash2, Search } from "lucide-react";
+import { Plus, Pencil, Trash2, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -21,17 +21,28 @@ const ProductsTab = () => {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalProducts, setTotalProducts] = useState(0);
+  const itemsPerPage = 10;
   const { toast } = useToast();
 
   useEffect(() => {
-    loadProducts();
+    setCurrentPage(1);
+    loadProducts(1);
   }, [searchQuery]);
 
-  const loadProducts = async () => {
+  const loadProducts = async (page: number) => {
     setLoading(true);
     try {
-      const result = await getProducts(undefined, searchQuery, 1, 1000);
+      const result = await getProducts(undefined, searchQuery, page, itemsPerPage);
       setProducts(result.data || []);
+      
+      // Calculate total pages
+      const total = result.total || 0;
+      setTotalProducts(total);
+      setTotalPages(Math.ceil(total / itemsPerPage));
+      setCurrentPage(page);
     } catch (error: any) {
       toast({
         title: "Error",
@@ -190,11 +201,45 @@ const ProductsTab = () => {
         </div>
       )}
 
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between">
+          <div className="text-sm text-muted-foreground">
+            Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, totalProducts)} of {totalProducts} products
+          </div>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => loadProducts(currentPage - 1)}
+              disabled={currentPage === 1 || loading}
+            >
+              <ChevronLeft className="h-4 w-4 mr-1" />
+              Previous
+            </Button>
+            <div className="flex items-center gap-2 px-3">
+              <span className="text-sm">
+                Page {currentPage} of {totalPages}
+              </span>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => loadProducts(currentPage + 1)}
+              disabled={currentPage === totalPages || loading}
+            >
+              Next
+              <ChevronRight className="h-4 w-4 ml-1" />
+            </Button>
+          </div>
+        </div>
+      )}
+
       <ProductDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         product={selectedProduct}
-        onSuccess={loadProducts}
+        onSuccess={() => loadProducts(currentPage)}
       />
     </div>
   );

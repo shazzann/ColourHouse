@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import AddToCartDialog from "@/components/AddToCartDialog";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { getProduct, getSettings, getCategories } from "@/lib/api";
+import { getProduct, getSettings, getCategories, getProductCategories } from "@/lib/api";
 import { generateWhatsAppLink } from "@/lib/whatsapp";
 import { useToast } from "@/hooks/use-toast";
 
@@ -21,6 +21,7 @@ const ProductDetail = () => {
   const { id } = useParams();
   const [product, setProduct] = useState<any>(null);
   const [allCategories, setAllCategories] = useState<any[]>([]);
+  const [productCategoryIds, setProductCategoryIds] = useState<string[]>([]);
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [loading, setLoading] = useState(true);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -37,14 +38,16 @@ const ProductDetail = () => {
     
     setLoading(true);
     try {
-      const [productData, settingsData, categoriesData] = await Promise.all([
+      const [productData, settingsData, categoriesData, productCatIds] = await Promise.all([
         getProduct(id),
         getSettings(),
         getCategories(),
+        getProductCategories(id),
       ]);
       
       setProduct(productData);
       setAllCategories(categoriesData);
+      setProductCategoryIds(productCatIds);
       
       if (settingsData) {
         setWhatsappNumber(settingsData.whatsapp_number);
@@ -219,13 +222,15 @@ const ProductDetail = () => {
 
             {/* Details */}
             <div className="space-y-6">
-              {allCategories && allCategories.length > 0 && (
+              {productCategoryIds && productCategoryIds.length > 0 && (
                 <div className="flex flex-wrap gap-2">
-                  {allCategories.map((category: any) => (
-                    <Badge key={category.id} variant="secondary" className="text-sm">
-                      {category.name}
-                    </Badge>
-                  ))}
+                  {allCategories
+                    .filter((category: any) => productCategoryIds.includes(category.id))
+                    .map((category: any) => (
+                      <Badge key={category.id} variant="secondary" className="text-sm">
+                        {category.name}
+                      </Badge>
+                    ))}
                 </div>
               )}
               

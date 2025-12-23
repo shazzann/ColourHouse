@@ -50,7 +50,7 @@ router.get('/', async (req, res) => {
 
     res.json({
       data: productsResult.rows || [],
-      count: countResult.rows[0].count,
+      total: parseInt(countResult.rows[0].count),
     });
   } catch (error) {
     res.status(500).json({ error: error.message });

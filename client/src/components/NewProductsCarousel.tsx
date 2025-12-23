@@ -64,9 +64,9 @@ const NewProductsCarousel = () => {
     loadProducts();
   }, []);
 
-  // Auto-slide every 5 seconds
+  // Auto-slide every 5 seconds - only if there are more than 3 products
   useEffect(() => {
-    if (!autoSlide || products.length === 0) return;
+    if (!autoSlide || products.length === 0 || products.length <= 3) return;
 
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % (products.length - itemsToShow + 1));
@@ -119,13 +119,15 @@ const NewProductsCarousel = () => {
         {/* Carousel Container */}
         <div className="relative group px-8 sm:px-0">
           {/* Left Arrow */}
-          <button
-            onClick={goToPrevious}
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-primary/80 hover:bg-primary text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity"
-            aria-label="Previous products"
-          >
-            <ChevronLeft className="h-6 w-6" />
-          </button>
+          {products.length > 3 && (
+            <button
+              onClick={goToPrevious}
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-primary/80 hover:bg-primary text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity"
+              aria-label="Previous products"
+            >
+              <ChevronLeft className="h-6 w-6" />
+            </button>
+          )}
 
           {/* Products Grid */}
           <div className="overflow-hidden">
@@ -195,32 +197,36 @@ const NewProductsCarousel = () => {
           </div>
 
           {/* Right Arrow */}
-          <button
-            onClick={goToNext}
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-primary/80 hover:bg-primary text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity"
-            aria-label="Next products"
-          >
-            <ChevronRight className="h-6 w-6" />
-          </button>
+          {products.length > 3 && (
+            <button
+              onClick={goToNext}
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-primary/80 hover:bg-primary text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity"
+              aria-label="Next products"
+            >
+              <ChevronRight className="h-6 w-6" />
+            </button>
+          )}
         </div>
 
         {/* Carousel Indicators */}
-        <div className="flex justify-center gap-2 mt-8">
-          {Array.from({ length: Math.ceil(products.length - itemsToShow + 1) || 1 }).map((_, index) => (
-            <button
-              key={index}
-              onClick={() => {
-                setCurrentIndex(index);
-                setAutoSlide(false);
-                setTimeout(() => setAutoSlide(true), 2000);
-              }}
-              className={`h-2 rounded-full transition-all ${
-                index === currentIndex ? "bg-primary w-8" : "bg-muted-foreground/30 w-2 hover:bg-muted-foreground/50"
-              }`}
-              aria-label={`Go to slide ${index + 1}`}
-            />
-          ))}
-        </div>
+        {products.length > 3 && (
+          <div className="flex justify-center gap-2 mt-8">
+            {Array.from({ length: Math.ceil(products.length - itemsToShow + 1) || 1 }).map((_, index) => (
+              <button
+                key={index}
+                onClick={() => {
+                  setCurrentIndex(index);
+                  setAutoSlide(false);
+                  setTimeout(() => setAutoSlide(true), 2000);
+                }}
+                className={`h-2 rounded-full transition-all ${
+                  index === currentIndex ? "bg-primary w-8" : "bg-muted-foreground/30 w-2 hover:bg-muted-foreground/50"
+                }`}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

@@ -63,7 +63,7 @@ const ProductsTab = () => {
         title: "Success",
         description: "Product deleted successfully.",
       });
-      loadProducts();
+      loadProducts(currentPage);
     } catch (error: any) {
       toast({
         title: "Error",

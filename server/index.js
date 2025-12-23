@@ -23,6 +23,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 app.use(
   cors({
     origin: [
+      "https://colourhouse.lk",
+      "https://www.colourhouse.lk",
       "https://colour-house-gamma.vercel.app",
     ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],

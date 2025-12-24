@@ -179,9 +179,11 @@ const NewProductsCarousel = () => {
                           <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 flex-1">{product.description}</p>
                         )}
                         <div className="flex items-center justify-between pt-2 flex-shrink-0">
-                          <span className="text-primary font-bold text-sm sm:text-lg">
-                            RS. {!isNaN(Number(product.price)) ? Number(product.price).toFixed(2) : "N/A"}
-                          </span>
+                          {product.price ? (
+                            <p className="text-xl font-bold text-primary">RS. {!isNaN(Number(product.price)) ? Number(product.price).toFixed(2) : "N/A"}</p>
+                          ) : (
+                            <p className="text-xs text-muted-foreground italic">Price on inquiry</p>
+                          )}
                           {product.stock_quantity > 0 && (
                             <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
                               In Stock
@@ -219,9 +221,8 @@ const NewProductsCarousel = () => {
                   setAutoSlide(false);
                   setTimeout(() => setAutoSlide(true), 2000);
                 }}
-                className={`h-2 rounded-full transition-all ${
-                  index === currentIndex ? "bg-primary w-8" : "bg-muted-foreground/30 w-2 hover:bg-muted-foreground/50"
-                }`}
+                className={`h-2 rounded-full transition-all ${index === currentIndex ? "bg-primary w-8" : "bg-muted-foreground/30 w-2 hover:bg-muted-foreground/50"
+                  }`}
                 aria-label={`Go to slide ${index + 1}`}
               />
             ))}

@@ -55,7 +55,7 @@ const Products = () => {
       ]);
       
       setProducts(productsResult.data);
-      setTotalCount(productsResult.count);
+      setTotalCount(productsResult.total);
       setCategories(categoriesData);
       if (settingsData) {
         setWhatsappNumber(settingsData.whatsapp_number);
